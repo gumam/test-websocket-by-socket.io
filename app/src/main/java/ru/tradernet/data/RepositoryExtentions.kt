@@ -1,17 +1,10 @@
 package ru.tradernet.data
 
-import ru.tradernet.data.api.model.RepositoryApiModel
+import ru.tradernet.data.api.model.TikerApiModel
+import ru.tradernet.domain.model.TikerInfoModel
 
-fun RepositoryApiModel.toRepository(commitsCount: Int? = null): Repository {
-    return Repository(
-        id,
-        name,
-        description,
-        language,
-        starsCount,
-        forksCount,
-        commitsCount,
-        owner.login,
-        owner.avatarUrl
+fun TikerApiModel.toTiker(): TikerInfoModel {
+    return TikerInfoModel(
+        name
     )
 }

@@ -1,19 +1,5 @@
 <resources>
-    <string name="app_name">Test Tradernet</string>
-    <string name="favorites_action">Избранное</string>
-    <string name="main_list_action">Список репозиториев</string>
-
-    <string name="favorites_title">Избранное</string>
-    <string name="main_list_title">Список репозиториев</string>
-    <string name="owner">Автор:</string>
-    <string name="title_name">Название:</string>
-    <string name="language">Язык:</string>
-    <string name="forks_count">Количество форков:</string>
-    <string name="stars_count">Количество звезд:</string>
-    <string name="commits_count">Количество коммитов:</string>
-
-    <string name="add_favorite">Добавить в избранное</string>
-    <string name="remove_favorite">Удалить из избранного</string>
+    <string name="app_name">Tradernet</string>
 
     <string name="error_text">Oops something went wrong</string>
 </resources>
