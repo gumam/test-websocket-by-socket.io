@@ -2,7 +2,7 @@ package ru.tradernet.presentation.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import ru.tradernet.test.R
+import ru.tradernet.R
 import ru.tradernet.presentation.ui.mainList.MainListFragment
 
 class MainActivity : AppCompatActivity() {

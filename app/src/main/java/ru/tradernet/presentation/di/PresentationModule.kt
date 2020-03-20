@@ -7,7 +7,6 @@ import ru.tradernet.presentation.ui.mainList.MainListViewModel
 object PresentationModule {
 
     fun create() = module {
-        viewModel { MainViewModel() }
         viewModel { MainListViewModel(get()) }
     }
 }

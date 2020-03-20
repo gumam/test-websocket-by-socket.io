@@ -3,11 +3,10 @@ package ru.tradernet.presentation.ui.mainList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import ru.tradernet.test.R
+import ru.tradernet.R
 import ru.tradernet.domain.model.TikerInfoModel
 
 class TikersAdapter(
@@ -18,7 +17,7 @@ class TikersAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TikerViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return TikerViewHolder(
-            inflater.inflate(R.layout.repo_item, parent, false)
+            inflater.inflate(R.layout.item_tiker, parent, false)
         )
     }
 
@@ -34,9 +33,9 @@ class TikerViewHolder(
     view: View
 ) : RecyclerView.ViewHolder(view) {
 
-    private val name: TextView = itemView.findViewById(R.id.repoName)
-    private val id: TextView = itemView.findViewById(R.id.repoId)
-    private val description: TextView = itemView.findViewById(R.id.description)
+//    private val name: TextView = itemView.findViewById(R.id.repoName)
+//    private val id: TextView = itemView.findViewById(R.id.repoId)
+//    private val description: TextView = itemView.findViewById(R.id.description)
 
     fun bind(tikerInfoModel: TikerInfoModel) {
 //        name.text = repository.name

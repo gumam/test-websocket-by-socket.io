@@ -9,8 +9,8 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import ru.tradernet.data.api.Api
-import ru.tradernet.data.repositories.TikerRepositoryImpl
-import ru.tradernet.domain.interfaces.TikerRepository
+import ru.tradernet.data.repositories.TickerRepositoryImpl
+import ru.tradernet.domain.interfaces.TickerRepository
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -21,14 +21,16 @@ object DataModule {
     fun create() = module {
         single {
             createApi(
-                createHttpClient(),
+                get(),
                 get()
             )
         }
 
         single { createMoshi() }
 
-        factory { TikerRepositoryImpl() as TikerRepository }
+        factory { createHttpClient() }
+
+        single { TickerRepositoryImpl(get()) as TickerRepository }
     }
 
     private fun createApi(client: OkHttpClient, moshi: Moshi): Api {
