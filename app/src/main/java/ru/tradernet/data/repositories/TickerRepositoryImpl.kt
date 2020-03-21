@@ -1,5 +1,6 @@
 package ru.tradernet.data.repositories
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.github.nkzawa.emitter.Emitter
 import com.github.nkzawa.socketio.client.IO
@@ -8,7 +9,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import ru.tradernet.domain.interfaces.TickerRepository
-import ru.tradernet.domain.model.TikerInfoModel
+import ru.tradernet.domain.model.TickerInfoModel
 import timber.log.Timber
 import java.net.URISyntaxException
 
@@ -22,7 +23,7 @@ class TickerRepositoryImpl(
 
     private val REQUEST_UPDATE_CHANNEL = "sup_updateSecurities2"
 
-    val tikers = MutableLiveData<TikerInfoModel>()
+    private val tickers = MutableLiveData<List<TickerInfoModel>>()
 
     private var socket: Socket? = null
     init {
@@ -44,6 +45,10 @@ class TickerRepositoryImpl(
         socket?.emit(REQUEST_UPDATE_CHANNEL, jsonText)
 
         timber.d("createSubscription: $jsonText")
+    }
+
+    override suspend fun subscribeToTickersInfo(): LiveData<List<TickerInfoModel>> {
+        return tickers
     }
 
     override fun onCreate() {

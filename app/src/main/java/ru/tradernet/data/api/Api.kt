@@ -7,6 +7,6 @@ import ru.tradernet.data.api.model.TickersCodesResponse
 
 interface Api {
 
-    @GET
-    suspend fun get(@Query("q") model: Request): TickersCodesResponse
+    @GET("api")
+    suspend fun get(@Query("q") model: String): TickersCodesResponse
 }

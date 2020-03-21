@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 
 object DataModule {
 
-    private const val BASE_URL = "https://api.github.com/"
+    private const val BASE_URL = "https://tradernet.ru/"
 
     fun create() = module {
         single {

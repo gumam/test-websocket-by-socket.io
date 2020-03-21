@@ -1,10 +1,7 @@
 package ru.tradernet.data.api.model
 
-import com.squareup.moshi.Json
-
 data class Request(
-    @Json(name = "cmd")
-    val command: String,
+    val cmd: String,
     val params: Params
 )
 

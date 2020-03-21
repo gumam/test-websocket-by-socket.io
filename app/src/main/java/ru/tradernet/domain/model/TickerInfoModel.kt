@@ -1,5 +1,5 @@
 package ru.tradernet.domain.model
 
-data class TikerInfoModel(
+data class TickerInfoModel(
     val name: String
 )

@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.tradernet.R
-import ru.tradernet.domain.model.TikerInfoModel
+import ru.tradernet.domain.model.TickerInfoModel
 
 class TikersAdapter(
-) : ListAdapter<TikerInfoModel, TikerViewHolder>(
+) : ListAdapter<TickerInfoModel, TikerViewHolder>(
     RepoDiff
 ) {
 
@@ -37,22 +37,22 @@ class TikerViewHolder(
 //    private val id: TextView = itemView.findViewById(R.id.repoId)
 //    private val description: TextView = itemView.findViewById(R.id.description)
 
-    fun bind(tikerInfoModel: TikerInfoModel) {
+    fun bind(tickerInfoModel: TickerInfoModel) {
 //        name.text = repository.name
 //        id.text = repository.id.toString()
 //        description.text = repository.description
     }
 }
 
-object RepoDiff : DiffUtil.ItemCallback<TikerInfoModel>() {
+object RepoDiff : DiffUtil.ItemCallback<TickerInfoModel>() {
     override fun areItemsTheSame(
-        oldItem: TikerInfoModel,
-        newItem: TikerInfoModel
+        oldItem: TickerInfoModel,
+        newItem: TickerInfoModel
     ): Boolean {
         return oldItem.name == newItem.name
     }
 
-    override fun areContentsTheSame(oldItem: TikerInfoModel, newItem: TikerInfoModel): Boolean {
+    override fun areContentsTheSame(oldItem: TickerInfoModel, newItem: TickerInfoModel): Boolean {
         return oldItem == newItem
     }
 }
