@@ -1,8 +1,10 @@
 package ru.tradernet.domain.interfaces
 
-import ru.tradernet.domain.model.TikerInfoModel
-
 interface TickerRepository {
 
-    suspend fun fetchTikers(): List<TikerInfoModel>
+    suspend fun createSubscription(tickersCodes: List<String>)
+
+    fun onCreate()
+
+    fun onDestroy()
 }

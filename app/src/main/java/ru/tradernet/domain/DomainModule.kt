@@ -6,6 +6,6 @@ import ru.tradernet.domain.interactors.TickerInteractor
 object DomainModule {
 
     fun create() = module {
-        factory { TickerInteractor(get()) }
+        factory { TickerInteractor(get(), get()) }
     }
 }

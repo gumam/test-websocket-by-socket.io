@@ -1,63 +1,69 @@
 package ru.tradernet.data.repositories
 
 import androidx.lifecycle.MutableLiveData
-import okhttp3.*
-import okio.ByteString
+import com.github.nkzawa.emitter.Emitter
+import com.github.nkzawa.socketio.client.IO
+import com.github.nkzawa.socketio.client.Socket
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import ru.tradernet.domain.interfaces.TickerRepository
 import ru.tradernet.domain.model.TikerInfoModel
 import timber.log.Timber
+import java.net.URISyntaxException
+
 
 class TickerRepositoryImpl(
-    private val webClient: OkHttpClient
-) : TickerRepository, WebSocketListener() {
+    private val moshi: Moshi
+) : TickerRepository, Emitter.Listener {
 
-    val TICKERS_NAMES =
-        "RSTI,GAZP,MRKZ,RUAL,HYDR,MRKS,SBER,FEES,TGKA,VTBR,ANH.US,VICL.US,BURG.US," +
-                "NBL.US,YETI.US,WSFS.US,NIO.US,DXC.US,MIC.US,HSBC.US,EXPN.EU,GSK.EU,SHP.EU,MAN.EU," +
-                "DB1.EU,MUV2.EU,TATE.EU,KGF.EU,MGGT.EU,SGGD.EU"
+    private val timber: Timber.Tree
+        get() = Timber.tag("webSocket")
+
+    private val REQUEST_UPDATE_CHANNEL = "sup_updateSecurities2"
 
     val tikers = MutableLiveData<TikerInfoModel>()
 
+    private var socket: Socket? = null
     init {
-        openConnection()
+        try {
+            socket = IO.socket("https://ws3.tradernet.ru")
+        } catch (e: URISyntaxException) {
+            timber.e(e)
+        }
     }
 
-    override suspend fun fetchTikers(): List<TikerInfoModel> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override suspend fun createSubscription(tickersCodes: List<String>) {
 
-    override fun onOpen(webSocket: WebSocket, response: Response) {
-        webSocket.send("Hello, it's Saurel !")
-
-        Timber.tag("webSocket").d("onOpen")
-    }
-
-    override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-        Timber.tag("webSocket").d("onMessage bytes: $bytes")
-    }
-
-    override fun onMessage(webSocket: WebSocket, text: String) {
-        Timber.tag("webSocket").d("onMessage text: $text")
-    }
-
-    override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-        super.onClosing(webSocket, code, reason)
-
-        Timber.tag("webSocket").d("onClosing")
-    }
-
-    override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-        super.onClosed(webSocket, code, reason)
-
-        Timber.tag("webSocket").d("onClosed")
-    }
-
-    private fun openConnection() {
-        webClient.newWebSocket(
-            Request.Builder().url("wss://ws3.tradernet.ru").build(),
-            this
+        val type = Types.newParameterizedType(
+            MutableList::class.java,
+            String::class.java
         )
+        val jsonAdapter: JsonAdapter<List<String>> = moshi.adapter(type)
+        val jsonText = jsonAdapter.toJson(tickersCodes)
+        socket?.emit(REQUEST_UPDATE_CHANNEL, jsonText)
 
-        Timber.tag("webSocket").d("openConnection")
+        timber.d("createSubscription: $jsonText")
+    }
+
+    override fun onCreate() {
+        timber.d("onCreate")
+
+        socket?.on(REQUEST_UPDATE_CHANNEL, this)
+        socket?.connect()
+    }
+
+    override fun onDestroy() {
+        timber.d("onDestroy")
+
+        socket?.disconnect()
+        socket?.off(REQUEST_UPDATE_CHANNEL, this)
+    }
+
+    override fun call(vararg args: Any?) {
+        val jsonText: String = args[0].toString()
+
+        //todo parse json
+        timber.d(jsonText)
     }
 }
