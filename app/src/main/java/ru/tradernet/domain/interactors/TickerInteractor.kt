@@ -1,7 +1,6 @@
 package ru.tradernet.domain.interactors
 
 import androidx.lifecycle.LiveData
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import ru.tradernet.data.api.Api
 import ru.tradernet.data.api.model.Command
@@ -32,7 +31,7 @@ class TickerInteractor(
     }
 
     suspend fun createSubscription(tickersCodes: List<String>) {
-        repository.createSubscription(tickersCodes)
+        repository.setTickersCodes(tickersCodes)
     }
 
     suspend fun subscribeToTickersInfo(): LiveData<List<TickerInfoModel>> {

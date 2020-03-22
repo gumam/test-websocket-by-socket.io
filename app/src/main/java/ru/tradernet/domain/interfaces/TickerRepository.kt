@@ -5,7 +5,7 @@ import ru.tradernet.domain.model.TickerInfoModel
 
 interface TickerRepository {
 
-    suspend fun createSubscription(tickersCodes: List<String>)
+    suspend fun setTickersCodes(tickersCodes: List<String>)
 
     suspend fun subscribeToTickersInfo(): LiveData<List<TickerInfoModel>>
 
