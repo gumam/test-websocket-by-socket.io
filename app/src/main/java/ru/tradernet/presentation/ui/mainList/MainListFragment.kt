@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.main_list_fragment.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
@@ -16,7 +17,7 @@ import ru.tradernet.presentation.EventObserver
 class MainListFragment : Fragment() {
 
     private val viewModel by viewModel<MainListViewModel>()
-    private lateinit var adapter: TikersAdapter
+    private lateinit var adapter: TickersAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,13 +32,23 @@ class MainListFragment : Fragment() {
 
         setupToolbar()
 
-        adapter = TikersAdapter()
+        adapter = TickersAdapter {
+            //todo item click
+        }
+
         list.adapter = adapter
 
         viewModel.showProblemMessage.observe(
             viewLifecycleOwner,
             EventObserver {
                 Snackbar.make(requireView(), R.string.error_text, Snackbar.LENGTH_SHORT).show()
+            }
+        )
+
+        viewModel.tickers.observe(
+            viewLifecycleOwner,
+            Observer {
+                adapter.submitList(it)
             }
         )
     }

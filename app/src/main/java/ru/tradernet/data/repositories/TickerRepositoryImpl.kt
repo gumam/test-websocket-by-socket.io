@@ -15,7 +15,7 @@ import java.net.URISyntaxException
 
 class TickerRepositoryImpl(
     private val moshi: Moshi,
-    okHttpClient: OkHttpClient
+    private val okHttpClient: OkHttpClient
 ) : TickerRepository {
 
     private val timber: Timber.Tree
@@ -33,7 +33,59 @@ class TickerRepositoryImpl(
 
     private var socket: Socket? = null
 
-    init {
+    override suspend fun setTickersCodes(tickersCodes: List<String>) {
+        if (tickersCodes.isNotEmpty()) this.tickersCodes = tickersCodes
+        if (connected) setSubscription()
+    }
+
+    private fun setSubscription() {
+        socket?.on("q") {
+            val jsonText: String? = it.getOrNull(0)?.toString()
+            jsonText?.run {
+                val adapter = moshi.adapter(TickersSocketResponse::class.java)
+                val newTickers = adapter.fromJson(this)?.q
+                val currentTickers = tickers.value?.toMutableList() ?: mutableListOf()
+
+                newTickers?.forEach { newTicker ->
+                    val sameTickerIndex = currentTickers.indexOfFirst { it.name == newTicker.name }
+                    val sameTicker =
+                        if (sameTickerIndex >= 0) currentTickers[sameTickerIndex] else null
+
+                    if (sameTicker == null) currentTickers.add(newTicker)
+                    else currentTickers[sameTickerIndex] = sameTicker.copyFrom(newTicker)
+                }
+
+                tickers.postValue(currentTickers)
+                timber.d("received q tickers")
+            }
+        }
+
+        val jsonArray = JSONArray()
+        tickersCodes.forEach { jsonArray.put(it) }
+        tickers.postValue(listOf())
+        socket?.emit("sup_updateSecurities2", jsonArray)
+    }
+
+    override suspend fun subscribeToTickersInfo(): LiveData<List<TickerInfoModel>> {
+        return tickers
+    }
+
+    override fun onCreate() {
+        timber.d("onCreate")
+
+        initSocket()
+    }
+
+    override fun onDestroy() {
+        timber.d("onDestroy")
+        connected = false
+        socket?.close()
+        socket?.off()
+
+        socket = null
+    }
+
+    private fun initSocket() {
         try {
             val options = IO.Options()
             options.callFactory = okHttpClient
@@ -56,54 +108,9 @@ class TickerRepositoryImpl(
                     val error = it.getOrNull(0) as? Exception
                     timber.w(error)
                 }
+            socket!!.open()
         } catch (e: URISyntaxException) {
             timber.e(e)
         }
-    }
-
-    override suspend fun setTickersCodes(tickersCodes: List<String>) {
-        if (tickersCodes.isNotEmpty()) this.tickersCodes = tickersCodes
-        if (connected) setSubscription()
-    }
-
-    private fun setSubscription() {
-        socket?.on("q") {
-            val jsonText: String? = it.getOrNull(0)?.toString()
-            jsonText?.run {
-                val adapter = moshi.adapter(TickersSocketResponse::class.java)
-                val newTickers = adapter.fromJson(this)?.q
-                val currentTickers = tickers.value?.toMutableList() ?: mutableListOf()
-
-                newTickers?.forEach { newTicker ->
-                    val sameTickerIndex = currentTickers.indexOfFirst { it.name == newTicker.name }
-                    if (sameTickerIndex >= 0) currentTickers[sameTickerIndex] = newTicker
-                    else currentTickers.add(newTicker)
-                }
-
-                tickers.postValue(currentTickers)
-            }
-        }
-
-        val jsonArray = JSONArray()
-        tickersCodes.forEach { jsonArray.put(it) }
-        tickers.postValue(listOf())
-        socket?.emit("sup_updateSecurities2", jsonArray)
-    }
-
-    override suspend fun subscribeToTickersInfo(): LiveData<List<TickerInfoModel>> {
-        return tickers
-    }
-
-    override fun onCreate() {
-        timber.d("onCreate")
-
-        socket?.open()
-    }
-
-    override fun onDestroy() {
-        timber.d("onDestroy")
-
-        socket?.close()
-        socket?.off()
     }
 }

@@ -16,7 +16,7 @@ class MainListViewModel(
 ) : ViewModel() {
 
     val showProblemMessage = MutableLiveData<Event<Unit>>()
-    val tikers = MediatorLiveData<List<TickerInfoModel>>()
+    val tickers = MediatorLiveData<List<TickerInfoModel>>()
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         showProblemMessage.value = Event(Unit)
@@ -27,8 +27,8 @@ class MainListViewModel(
         viewModelScope.launch(errorHandler) {
             val tickersCodes = interactor.fetchTickersCodes()
             interactor.createSubscription(tickersCodes)
-            tikers.addSource(interactor.subscribeToTickersInfo()) { tikersInfos ->
-                tikers.value = tikersInfos
+            tickers.addSource(interactor.subscribeToTickersInfo()) { tikersInfos ->
+                tickers.value = tikersInfos
             }
         }
     }

@@ -20,4 +20,15 @@ data class TickerInfoModel(
 
     @Json(name = "chg")
     val pointChanges: Float?
-)
+) {
+    fun copyFrom(otherTicker: TickerInfoModel?): TickerInfoModel {
+        return this.copy(
+            name = name,
+            percentChanges = otherTicker?.percentChanges ?: percentChanges,
+            exchangeName = otherTicker?.exchangeName ?: exchangeName,
+            stockName = otherTicker?.stockName ?: stockName,
+            price = otherTicker?.price ?: price,
+            pointChanges = otherTicker?.pointChanges ?: pointChanges
+        )
+    }
+}
