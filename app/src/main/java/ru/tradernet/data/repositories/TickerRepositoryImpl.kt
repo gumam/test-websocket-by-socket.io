@@ -2,11 +2,10 @@ package ru.tradernet.data.repositories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import io.socket.client.IO
 import io.socket.client.Socket
 import okhttp3.OkHttpClient
+import org.json.JSONArray
 import ru.tradernet.domain.interfaces.TickerRepository
 import ru.tradernet.domain.model.TickerInfoModel
 import timber.log.Timber
@@ -14,7 +13,6 @@ import java.net.URISyntaxException
 
 
 class TickerRepositoryImpl(
-    private val moshi: Moshi,
     okHttpClient: OkHttpClient
 ) : TickerRepository {
 
@@ -25,7 +23,7 @@ class TickerRepositoryImpl(
             "BURG.US,NBL.US,YETI.US,WSFS.US,NIO.US,DXC.US,MIC.US,HSBC.US,EXPN.EU,GSK.EU,SHP.EU," +
             "MAN.EU,DB1.EU,MUV2.EU,TATE.EU,KGF.EU,MGGT.EU,SGGD.EU"
 
-    private var tikersCodes: List<String> = defaultCodes.split(',')
+    private var tickersCodes: List<String> = defaultCodes.split(',')
 
     private var connected = false
 
@@ -71,25 +69,21 @@ class TickerRepositoryImpl(
     }
 
     override suspend fun setTickersCodes(tickersCodes: List<String>) {
-        if (tickersCodes.isNotEmpty()) this.tikersCodes = tickersCodes
+        if (tickersCodes.isNotEmpty()) this.tickersCodes = tickersCodes
         if (connected) setSubscription()
     }
 
     private fun setSubscription() {
-        val type = Types.newParameterizedType(
-            MutableList::class.java,
-            String::class.java
-        )
-        val jsonAdapter = moshi.adapter<List<String>>(type)
-        val jsonText = jsonAdapter.toJson(this.tikersCodes)
         socket?.on("q") {
             val jsonText: String = it.getOrNull(0).toString()
 
             //todo parse json
             timber.d("q: $jsonText")
         }
-        socket?.emit("sup_updateSecurities2", jsonText)
-        timber.d("setSubscription: $jsonText")
+
+        val jsonArray = JSONArray()
+        tickersCodes.forEach { jsonArray.put(it) }
+        socket?.emit("sup_updateSecurities2", jsonArray)
     }
 
     override suspend fun subscribeToTickersInfo(): LiveData<List<TickerInfoModel>> {

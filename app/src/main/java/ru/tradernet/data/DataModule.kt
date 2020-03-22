@@ -30,7 +30,7 @@ object DataModule {
 
         factory { createHttpClient() }
 
-        single { TickerRepositoryImpl(get(), get()) as TickerRepository }
+        single { TickerRepositoryImpl(get()) as TickerRepository }
     }
 
     private fun createApi(client: OkHttpClient, moshi: Moshi): Api {

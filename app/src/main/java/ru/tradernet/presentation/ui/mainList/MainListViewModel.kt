@@ -20,7 +20,7 @@ class MainListViewModel(
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         showProblemMessage.value = Event(Unit)
-        Timber.w(exception)
+        Timber.e(exception)
     }
 
     init {
