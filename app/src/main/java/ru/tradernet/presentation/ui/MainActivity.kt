@@ -15,11 +15,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null) supportFragmentManager.beginTransaction().add(
-            R.id.container,
-            MainListFragment()
-        ).commit()
-
         tickerRepository.onCreate()
     }
 

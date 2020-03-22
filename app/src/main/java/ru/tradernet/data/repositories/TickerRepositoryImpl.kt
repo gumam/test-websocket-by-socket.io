@@ -25,7 +25,7 @@ class TickerRepositoryImpl(
             "BURG.US,NBL.US,YETI.US,WSFS.US,NIO.US,DXC.US,MIC.US,HSBC.US,EXPN.EU,GSK.EU,SHP.EU," +
             "MAN.EU,DB1.EU,MUV2.EU,TATE.EU,KGF.EU,MGGT.EU,SGGD.EU"
 
-    private var tickersCodes: List<String> = defaultCodes.split(',')
+    private var tickersCodes: List<String> = listOf()
 
     private var connected = false
 
@@ -34,7 +34,9 @@ class TickerRepositoryImpl(
     private var socket: Socket? = null
 
     override suspend fun setTickersCodes(tickersCodes: List<String>) {
-        if (tickersCodes.isNotEmpty()) this.tickersCodes = tickersCodes
+        tickers.postValue(listOf())
+        this.tickersCodes = if (tickersCodes.isNotEmpty()) tickersCodes
+        else defaultCodes.split(",")
         if (connected) setSubscription()
     }
 
@@ -62,7 +64,6 @@ class TickerRepositoryImpl(
 
         val jsonArray = JSONArray()
         tickersCodes.forEach { jsonArray.put(it) }
-        tickers.postValue(listOf())
         socket?.emit("sup_updateSecurities2", jsonArray)
     }
 

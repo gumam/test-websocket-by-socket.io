@@ -6,8 +6,9 @@
     android:layout_height="match_parent"
     tools:context="ru.tradernet.presentation.ui.MainActivity">
 
-    <FrameLayout
+    <fragment
         android:id="@+id/container"
+        android:name="ru.tradernet.presentation.ui.mainList.MainListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
