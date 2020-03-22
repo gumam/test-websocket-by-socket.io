@@ -2,17 +2,19 @@ package ru.tradernet.data.repositories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.squareup.moshi.Moshi
 import io.socket.client.IO
 import io.socket.client.Socket
 import okhttp3.OkHttpClient
 import org.json.JSONArray
+import ru.tradernet.data.api.model.TickersSocketResponse
 import ru.tradernet.domain.interfaces.TickerRepository
 import ru.tradernet.domain.model.TickerInfoModel
 import timber.log.Timber
 import java.net.URISyntaxException
 
-
 class TickerRepositoryImpl(
+    private val moshi: Moshi,
     okHttpClient: OkHttpClient
 ) : TickerRepository {
 
@@ -46,22 +48,13 @@ class TickerRepositoryImpl(
                     timber.d("connect")
                     setSubscription()
                 }
-                .on(Socket.EVENT_MESSAGE) {
-                    timber.d("message")
+                .on(Socket.EVENT_ERROR) {
+                    val error = it.getOrNull(0) as? Exception
+                    timber.w(error)
                 }
                 .on(Socket.EVENT_ERROR) {
                     val error = it.getOrNull(0) as? Exception
-                    timber.e(error)
-                }
-                .on(Socket.EVENT_ERROR) {
-                    val error = it.getOrNull(0) as? Exception
-                    timber.e(error)
-                }
-                .on(Socket.EVENT_PING) {
-                    timber.d("ping")
-                }
-                .on(Socket.EVENT_PONG) {
-                    timber.d("pong")
+                    timber.w(error)
                 }
         } catch (e: URISyntaxException) {
             timber.e(e)
@@ -75,14 +68,25 @@ class TickerRepositoryImpl(
 
     private fun setSubscription() {
         socket?.on("q") {
-            val jsonText: String = it.getOrNull(0).toString()
+            val jsonText: String? = it.getOrNull(0)?.toString()
+            jsonText?.run {
+                val adapter = moshi.adapter(TickersSocketResponse::class.java)
+                val newTickers = adapter.fromJson(this)?.q
+                val currentTickers = tickers.value?.toMutableList() ?: mutableListOf()
 
-            //todo parse json
-            timber.d("q: $jsonText")
+                newTickers?.forEach { newTicker ->
+                    val sameTickerIndex = currentTickers.indexOfFirst { it.name == newTicker.name }
+                    if (sameTickerIndex >= 0) currentTickers[sameTickerIndex] = newTicker
+                    else currentTickers.add(newTicker)
+                }
+
+                tickers.postValue(currentTickers)
+            }
         }
 
         val jsonArray = JSONArray()
         tickersCodes.forEach { jsonArray.put(it) }
+        tickers.postValue(listOf())
         socket?.emit("sup_updateSecurities2", jsonArray)
     }
 
