@@ -59,8 +59,18 @@ class RepoViewHolder(
 
         changesPercent.text = ticker.percentChanges?.toString()
 
+        loadImage(ticker.name)
+
+        val bottomText = ticker.exchangeName + " | " + ticker.stockName
+        tickerCompany.text = bottomText
+
+        val pointsText = ticker.price.toString() + " (" + ticker.pointChanges + ") "
+        changesPoints.text = pointsText
+    }
+
+    private fun loadImage(tickerName: String) {
         val imageLink =
-            "https://tradernet.ru/logos/get-logo-by-ticker?ticker=" + ticker.name.toLowerCase()
+            "https://tradernet.ru/logos/get-logo-by-ticker?ticker=" + tickerName.toLowerCase()
         Glide.with(itemView)
             .load(imageLink)
             .centerCrop()
@@ -90,6 +100,7 @@ class RepoViewHolder(
             })
             .into(tickerIcon)
     }
+
 }
 
 object TickerDiff : DiffUtil.ItemCallback<TickerInfoModel>() {
