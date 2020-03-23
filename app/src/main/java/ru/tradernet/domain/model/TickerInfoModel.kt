@@ -9,6 +9,8 @@ data class TickerInfoModel(
     @Json(name = "pcp")
     val percentChanges: Float?,
 
+    var percentFieldChanges: Float = 0F,
+
     @Json(name = "ltr")
     val exchangeName: String?,
 
@@ -21,14 +23,18 @@ data class TickerInfoModel(
     @Json(name = "chg")
     val pointChanges: Float?
 ) {
-    fun copyFrom(otherTicker: TickerInfoModel?): TickerInfoModel {
+    fun copyFrom(newTicker: TickerInfoModel?): TickerInfoModel {
+        val newPercentChanges = newTicker?.percentChanges
+        val fieldPercentChange =
+            if (newPercentChanges != null && percentChanges != null) newPercentChanges - percentChanges else 0F
         return this.copy(
             name = name,
-            percentChanges = otherTicker?.percentChanges ?: percentChanges,
-            exchangeName = otherTicker?.exchangeName ?: exchangeName,
-            stockName = otherTicker?.stockName ?: stockName,
-            price = otherTicker?.price ?: price,
-            pointChanges = otherTicker?.pointChanges ?: pointChanges
+            percentChanges = newTicker?.percentChanges ?: percentChanges,
+            exchangeName = newTicker?.exchangeName ?: exchangeName,
+            stockName = newTicker?.stockName ?: stockName,
+            price = newTicker?.price ?: price,
+            pointChanges = newTicker?.pointChanges ?: pointChanges,
+            percentFieldChanges = fieldPercentChange
         )
     }
 }

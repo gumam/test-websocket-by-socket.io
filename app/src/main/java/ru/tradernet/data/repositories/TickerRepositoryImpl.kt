@@ -50,11 +50,11 @@ class TickerRepositoryImpl(
 
                 newTickers?.forEach { newTicker ->
                     val sameTickerIndex = currentTickers.indexOfFirst { it.name == newTicker.name }
-                    val sameTicker =
+                    val oldTicker =
                         if (sameTickerIndex >= 0) currentTickers[sameTickerIndex] else null
 
-                    if (sameTicker == null) currentTickers.add(newTicker)
-                    else currentTickers[sameTickerIndex] = sameTicker.copyFrom(newTicker)
+                    if (oldTicker == null) currentTickers.add(newTicker)
+                    else currentTickers[sameTickerIndex] = oldTicker.copyFrom(newTicker)
                 }
 
                 tickers.postValue(currentTickers)

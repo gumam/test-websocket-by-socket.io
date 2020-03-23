@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -57,14 +58,37 @@ class RepoViewHolder(
     fun bind(ticker: TickerInfoModel) {
         tickerName.text = ticker.name
 
-        changesPercent.text = ticker.percentChanges?.toString()
+        val percentFieldChanges = ticker.percentFieldChanges
+        val changesPercentBackgroundResource =
+            when {
+                percentFieldChanges > 0F -> R.drawable.percent_back_green
+                percentFieldChanges < 0F -> R.drawable.percent_back_red
+                else -> 0
+            }
+        changesPercent.setBackgroundResource(changesPercentBackgroundResource)
+
+        changesPercent.setTextColor(
+            ContextCompat.getColor(
+                itemView.context,
+                when {
+                    changesPercentBackgroundResource != 0 -> R.color.white
+                    ticker.percentChanges == null -> R.color.black
+                    ticker.percentChanges > 0F -> R.color.green
+                    ticker.percentChanges < 0F -> R.color.red
+                    else -> R.color.black
+                }
+            )
+        )
+
+        changesPercent.text = ticker.percentChanges?.let { if (it > 0) "+$it%" else "$it%" }
 
         loadImage(ticker.name)
 
         val bottomText = ticker.exchangeName + " | " + ticker.stockName
         tickerCompany.text = bottomText
 
-        val pointsText = ticker.price.toString() + " (" + ticker.pointChanges + ") "
+        val pointChanges = ticker.pointChanges?.let { if (it > 0) "+$it" else it.toString() }
+        val pointsText = ticker.price?.toString() + " ($pointChanges) "
         changesPoints.text = pointsText
     }
 
