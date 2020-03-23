@@ -18,6 +18,8 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import ru.tradernet.R
 import ru.tradernet.domain.model.TickerInfoModel
+import java.math.BigDecimal
+import java.text.DecimalFormat
 
 class TickersAdapter(
     private val listener: (TickerInfoModel) -> Unit
@@ -87,7 +89,10 @@ class RepoViewHolder(
         val bottomText = ticker.exchangeName + " | " + ticker.stockName
         tickerCompany.text = bottomText
 
-        val pointChanges = ticker.pointChanges?.let { if (it > 0) "+$it" else it.toString() }
+        val pointChanges = ticker.pointChanges?.let { changes ->
+            val changesString = changes.toBigDecimal().stripTrailingZeros().toPlainString()
+            if (changes > 0) "+$changesString" else changesString
+        }
         val pointsText = ticker.price?.toString() + " ($pointChanges) "
         changesPoints.text = pointsText
     }
