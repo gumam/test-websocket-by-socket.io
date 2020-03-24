@@ -6,8 +6,8 @@
 
     <color name="grey">#c0c0c0</color>
     <color name="dark_grey">#808080</color>
-    <color name="red">#ff5c5c</color>
-    <color name="green">#80FF80</color>
+    <color name="red">#ff2c57</color>
+    <color name="green">#75be43</color>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
 </resources>
